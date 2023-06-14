@@ -18,6 +18,18 @@ library(eha)
 library(casebase)
 
 
+### Load residence data ---------------------------------------------- 
+
+# Load the data
+id <- read_dta(file = "SOEP_V36/Stata/ppfad.dta")
+
+# Select variables
+id <- subset(id, select = c(persnr, pid, birthregion))
+
+# Clean the birthregion
+id$birthregion <- ifelse(id$birthregion %in% 11:16, "East",
+       ifelse(id$birthregion %in% 1:10, "West", NA_character_))
+
 ### Clean the bio-birth data  ----------------------------------------
 
 # Load the birth data
@@ -59,6 +71,7 @@ fert2 <- fert2 |> filter(!is.na(gebjahr) & !is.na(bioyear))
 # Create an event and censoring variable
 fert2 <- fert2 |> mutate(Event = if_else(is.na(kidgeb_01), 0, 1),
                          Censoring = if_else(Event == 0, bioyear - gebjahr, kidgeb_01 - gebjahr))
+
 
 ### Descriptive data ---------------------------------------------
 
@@ -169,21 +182,35 @@ pred_data <- expand.grid(Censoring = 18:55, cohort = unique(fert2$cohort))
 # Predict the result
 predict(lognor, type = "uquantile")
 
+
+### Split the data -----------------------------------------------
+
+# Split the data
+spell_data <- survSplit(fert2, cut = 15:55, end = "Censoring", event = "Event", start = "start")
+
 ### Discrete time model ------------------------------------------
 
 # Create the prediction data
 pred_data <- expand.grid(Censoring = 15:55, cohort = unique(fert2$cohort))
 
 # Estimate a logistic regression
-logist <- glm(Event ~ ns(Censoring, df = 5) * cohort, data = fert2)
+logist <- glm(Event ~ ns(Censoring, df = 5) * cohort, data = spell_data)
 
 # Predict the results
 pred_data$prediction <- predict(logist, pred_data)
 
+# Select the data
+pred_data <- subset(pred_data, Censoring >= 18 )
+
+# De-select data
+pred_data <- pred_data |> filter((cohort == "(1970,1980]" & Censoring <= 40) |
+                                   (cohort == "(1980,1990]" & Censoring <= 30 ) |
+                                   cohort %in% c("(1950,1960]", "(1960,1970]", "(1940,1950]"))
+
 # Plot the result
-ggplot(subset(pred_data, Censoring >= 18), aes(Censoring, prediction, colour = cohort, group = cohort)) +
-  geom_line()  +
-  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+ggplot(pred_data, aes(Censoring, prediction, colour = cohort, group = cohort)) +
+  geom_line(size = 1.3)  +
+  scale_y_continuous(limits = c(0, 0.15), expand = c(0, 0)) +
   ylab("Predicted - age-specific first birth rates") + 
   xlab("Age") +
   ggtitle("Spline logistic regression for first birth among men") +
@@ -196,9 +223,6 @@ ggsave(last_plot(), filename = "Figures/logistic_splines_soep.pdf")
 
 ### A non-parametric approach ------------------------------------
 
-# Split the data
-spell_data <- survSplit(fert2, cut = 15:55, end = "Censoring", event = "Event", start = "start")
-
 # Estimate the exposures
 exposures <- spell_data |> group_by(start, cohort) |> count()
 
@@ -209,11 +233,17 @@ births <- spell_data |> group_by(start, cohort) |> summarise(birth = sum(Event))
 unparametric <- inner_join(exposures, births) |> mutate(rate = birth / n)
 
 
+# De-select data
+pred_data <- unparametric |> filter((cohort == "(1970,1980]" & start <= 40) |
+                                      (cohort == "(1980,1990]" & start <= 30 ) |
+                                      cohort %in% c("(1950,1960]", "(1960,1970]", "(1940,1950]"))
+
 # Plot the result
 plot_raw <- unparametric |> filter(cohort %in% cohorts & start >= 18) |> 
   ggplot(aes(start, rate, colour = cohort, group = cohort, shape = cohort)) +
   geom_line() +
   geom_point() +
+  facet_wrap( ~ cohort, ncol = 1) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 0.15)) +
   ggtitle("Age-specific first-birth rates for men") +
@@ -228,6 +258,7 @@ plot_interpol <- unparametric |> filter(cohort %in% cohorts & start >= 18) |>
   geom_smooth(se = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 0.17)) +
+  facet_wrap( ~ cohort, ncol = 1) +
   ggtitle("Age-specific first-birth rates for men (smoothed)") +
   labs(caption = "Data: SOEP Wave 36") +
   ylab("Age-specific fertility rate (Parity 1)") +
@@ -242,15 +273,96 @@ ggsave(plot_interpol, filename = "Figures/smooth_firstbirth_soep.pdf")
 
 ### Combine with background variables ----------------------------
 
-# Join with the individual data
-#data <- inner_join(df, fert, by = "persnr")
+# Join with birthregion
+fert2 <- left_join(fert2, id)
+
+# Filter respondents where the birth information are existent
+fert2 <- fert2 |> filter(!is.na(birthregion))
+
+# Create spell data
+spell_data <- survSplit(fert2, cut = 15:55, end = "Censoring", event = "Event", start = "start")
+
+# Create the prediction data
+pred_data <- expand.grid(Censoring = 15:55, cohort = unique(fert2$cohort), birthregion = c("East", "West"))
+
+# Estimate a logistic regression
+logist <- glm(Event ~ ns(Censoring, df = 5) * cohort * birthregion, data = spell_data)
+
+# Predict the results
+pred_data$prediction <- predict(logist, pred_data)
+
+# Select the data
+pred_data <- subset(pred_data, Censoring >= 18 )
+
+# De-select data
+pred_data <- pred_data |> filter((cohort == "(1970,1980]" & Censoring <= 40) |
+                                   (cohort == "(1980,1990]" & Censoring <= 30 ) |
+                                   cohort %in% c("(1950,1960]", "(1960,1970]", "(1940,1950]"))
+
+# Plot the result
+ggplot(pred_data, aes(Censoring, prediction, colour = cohort, group = cohort)) +
+  geom_line(size = 1.3)  +
+  scale_y_continuous(limits = c(0, 0.2), expand = c(0, 0)) +
+  ylab("Predicted - age-specific first birth rates") + 
+  xlab("Age") +
+  facet_grid(cohort ~ birthregion) +
+  ggtitle("Spline logisticregression for first birth among men") +
+  labs(caption = "Data: SOEP W36") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) 
 
 
-# Filter men
-data <- data %>% filter(sex == 2)
+# Save the file
+ggsave(last_plot(), filename = "Figures/logistic_reg_soep.pdf")
 
-# Plot the data
-p <- ggplot(data, aes(x = sumkids)) +
-  geom_bar(position = "dodge", mapping = aes(y = ..prop.., group = treatment)) +
-  scale_x_continuous(limits = c(-0.5, 5))+
-  facet_wrap(~ treatment)
+
+### Unparametric by birthregion ------------------------------------
+
+# Estimate the exposures
+exposures <- spell_data |> group_by(start, cohort, birthregion) |> count()
+
+# Count the events
+births <- spell_data |> group_by(start, cohort, birthregion) |> summarise(birth = sum(Event))
+
+# Combine
+unparametric <- inner_join(exposures, births) |> mutate(rate = birth / n)
+
+# De-select data
+unparametric <- unparametric |> filter((cohort == "(1970,1980]" & start <= 40) |
+                                   (cohort == "(1980,1990]" & start <= 30 ) |
+                                   cohort %in% c("(1950,1960]", "(1960,1970]", "(1940,1950]"))
+
+# Plot the result
+plot_raw_reg <- unparametric |> filter(cohort %in% cohorts & start >= 18) |> 
+  ggplot(aes(start, rate, colour = cohort, group = cohort, shape = cohort)) +
+  geom_line() +
+  geom_point() +
+  facet_grid(cohort ~ birthregion) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.2)) +
+  ggtitle("Age-specific first-birth rates for men") +
+  labs(caption = "Data: SOEP Wave 36") +
+  ylab("Age-specific fertility rate (Parity 1)") +
+  xlab("Age") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE))
+
+# Plot interpolated
+plot_interpol_reg <- unparametric |> filter(cohort %in% cohorts & start >= 18) |> 
+  ggplot(aes(start, rate, colour = cohort, group = cohort, linetype = cohort, fill = cohort)) +
+  geom_smooth(se = FALSE) +
+  facet_grid(cohort ~ birthregion) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.2)) +
+  ggtitle("Age-specific first-birth rates for men (smoothed)") +
+  labs(caption = "Data: SOEP Wave 36") +
+  ylab("Age-specific fertility rate (Parity 1)") +
+  xlab("Age") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE),
+         linetype = guide_legend(nrow = 2, byrow = TRUE)) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "twodash", "solid"))
+
+## Save the graphs
+ggsave(plot_raw_reg, filename = "Figures/raw_firstbirth_soep_reg.pdf")
+ggsave(plot_interpol_reg, filename = "Figures/smooth_firstbirth_soep_reg.pdf")
+
+
+### END ##########################
