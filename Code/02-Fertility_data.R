@@ -169,9 +169,6 @@ ggplot(pred_data, aes(Censoring, prediction)) +
 
 ### A non-parametric approach ------------------------------------
 
-# Create a start variable
-fert2 <- fert2 |> mutate()
-
 # Split the data
 spell_data <- survSplit(fert2, cut = 15:55, end = "Censoring", event = "Event", start = "start")
 
@@ -191,20 +188,22 @@ plot_raw <- unparametric |> filter(cohort %in% cohorts & start >= 18) |>
   geom_line() +
   geom_point() +
   scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.15)) +
   ggtitle("Age-specific first-birth rates for men") +
-  labs(caption = "Data = SOEP Wave 36") +
+  labs(caption = "Data: SOEP Wave 36") +
   ylab("Age-specific fertility rate (Parity 1)") +
-  xalb("Age")
+  xlab("Age")
 
 # Plot interpolated
 plot_interpol <- unparametric |> filter(cohort %in% cohorts & start >= 18) |> 
-  ggplot(aes(start, rate, colour = cohort, group = cohort, linetype = cohort)) +
+  ggplot(aes(start, rate, colour = cohort, group = cohort, linetype = cohort, fill = cohort)) +
   geom_smooth() +
   scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.1)) +
   ggtitle("Age-specific first-birth rates for men (smoothed)") +
-  labs(caption = "Data = SOEP Wave 36") +
+  labs(caption = "Data: SOEP Wave 36") +
   ylab("Age-specific fertility rate (Parity 1)") +
-  xalb("Age")
+  xlab("Age")
 
 ## Save the graphs
 ggsave(plot_raw, filename = "Figures/raw_firstbirth_soep.pdf")
