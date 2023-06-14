@@ -56,11 +56,26 @@ fert2 <- fert2 |> mutate(cohort = cut(gebjahr, breaks = seq(1900, 2020, by = 10)
 # Double check
 fert2 <- fert2 |> filter(!is.na(gebjahr) & !is.na(bioyear))
 
-### Prepare the survival data ------------------------------------
-
 # Create an event and censoring variable
 fert2 <- fert2 |> mutate(Event = if_else(is.na(kidgeb_01), 0, 1),
                          Censoring = if_else(Event == 0, bioyear - gebjahr, kidgeb_01 - gebjahr))
+
+### Descriptive data ---------------------------------------------
+
+# Plot discriptively
+ggplot(subset(fert2, Censoring <= 55), aes(Censoring, fill = as.factor(Event))) +
+  geom_density(alpha = 0.3) +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
+  facet_wrap(~ cohort) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(caption = "Data: SOEP Wave36") +
+  scale_fill_manual(name = "Birth:", values = c(MPIDRorange, MPIDRblue)) +
+  xlab("Age")
+
+# Save
+ggsave(last_plot(), filename = "Figures/descriptive_age_firstbirth.pdf")
+
+### Prepare the survival data ------------------------------------
 
 # Look at the survival times
 with(fert2, Surv(Censoring, Event))
@@ -89,13 +104,13 @@ plot(km_coh)
 ### Fit the smoothed hazards -------------------------------------
 
 # Select the central cohorts
-cohorts <- c("(1940,1950]","(1950,1960]","(1960,1970]")
+cohorts <- c("(1940,1950]","(1950,1960]","(1960,1970]", "(1970,1980]", "(1980,1990]")
 
 # Filter the data
 fert2 <- fert2 |> filter(cohort %in% cohorts)
 
 # Run the regression model
-mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), df = 5) + cohort,
+mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), knots = c( 20, 30, 35, 40)) * cohort,
                           data = fert2, 
                           time = "Censoring")
 
@@ -114,7 +129,13 @@ plot_results <- plot(mod_cb,
 plot_results$fit |>
   filter(Censoring >= 15 & Censoring <= 50 & cohort %in% cohorts) |> 
   ggplot(aes(Censoring, visregFit, group = cohort, colour = cohort)) +
-  geom_line()
+  geom_line() +
+  scale_y_continuous(limits = c(0, 0.2), expand = c(0, 0)) +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
+  ylab("Predicted - age-specific first birth rates") + 
+  xlab("Age") +
+  ggtitle("Spline logistic regression for first birth among men") +
+  labs(caption = "Data: SOEP W36")
 
 ### Make parametric hazard models --------------------------------
 
@@ -136,9 +157,6 @@ lognor <- par_surv(distribution = "lognormal")
 # Log-logistic
 loglog <- par_surv(distribution = "loglogistic")
 
-# Generalized gamma
-
-
 # Make a result table
 stargazer(exp, weib, gauss, lognor, loglog)
 
@@ -154,18 +172,27 @@ predict(lognor, type = "uquantile")
 ### Discrete time model ------------------------------------------
 
 # Create the prediction data
-pred_data <- expand.grid(Censoring = 18:55, cohort = unique(fert2$cohort))
+pred_data <- expand.grid(Censoring = 15:55, cohort = unique(fert2$cohort))
 
 # Estimate a logistic regression
-logist <- glm(Event ~ ns(Censoring, df = 5), data = fert2)
+logist <- glm(Event ~ ns(Censoring, df = 5) * cohort, data = fert2)
 
 # Predict the results
 pred_data$prediction <- predict(logist, pred_data)
 
 # Plot the result
-ggplot(pred_data, aes(Censoring, prediction)) +
-  geom_line() #+
-#  geom_ribbon(aes(ymin = lower, ymax = upper))
+ggplot(subset(pred_data, Censoring >= 18), aes(Censoring, prediction, colour = cohort, group = cohort)) +
+  geom_line()  +
+  scale_y_continuous(limits = c(0, 1.2), expand = c(0, 0)) +
+  ylab("Predicted - age-specific first birth rates") + 
+  xlab("Age") +
+  ggtitle("Spline logistic regression for first birth among men") +
+  labs(caption = "Data: SOEP W36") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE)) 
+  
+
+# Save the file
+ggsave(last_plot(), filename = "Figures/logistic_splines_soep.pdf")
 
 ### A non-parametric approach ------------------------------------
 
@@ -192,18 +219,22 @@ plot_raw <- unparametric |> filter(cohort %in% cohorts & start >= 18) |>
   ggtitle("Age-specific first-birth rates for men") +
   labs(caption = "Data: SOEP Wave 36") +
   ylab("Age-specific fertility rate (Parity 1)") +
-  xlab("Age")
+  xlab("Age") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE))
 
 # Plot interpolated
 plot_interpol <- unparametric |> filter(cohort %in% cohorts & start >= 18) |> 
   ggplot(aes(start, rate, colour = cohort, group = cohort, linetype = cohort, fill = cohort)) +
-  geom_smooth() +
+  geom_smooth(se = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.1)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.17)) +
   ggtitle("Age-specific first-birth rates for men (smoothed)") +
   labs(caption = "Data: SOEP Wave 36") +
   ylab("Age-specific fertility rate (Parity 1)") +
-  xlab("Age")
+  xlab("Age") +
+  guides(colour = guide_legend(nrow = 2, byrow = TRUE),
+         linetype = guide_legend(nrow = 2, byrow = TRUE)) +
+  scale_linetype_manual(values = c("dashed", "dotted", "longdash", "twodash", "solid"))
 
 ## Save the graphs
 ggsave(plot_raw, filename = "Figures/raw_firstbirth_soep.pdf")
