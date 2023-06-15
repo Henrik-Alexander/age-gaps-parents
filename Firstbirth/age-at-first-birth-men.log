@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2023.6.15)  15 JUN 2023 10:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2023.6.15)  15 JUN 2023 14:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -554,78 +554,110 @@ LaTeX Font Warning: Font shape `T1/lmtt/bx/it' in size <10> not available
 [1
 
 {c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \vbox (badness 10000) detected at line 251
+Underfull \vbox (badness 10000) detected at line 245
  []
 
 
-Underfull \vbox (badness 10000) detected at line 251
+Underfull \vbox (badness 10000) detected at line 245
  []
 
-[2] [3]
-<age-at-first-birth-men_files/figure-latex/event-data-1.pdf, id=34, 469.755pt x 325.215pt>
+[2]
+<age-at-first-birth-men_files/figure-latex/cohort-distr-1.pdf, id=28, 469.755pt x 325.215pt>
+File: age-at-first-birth-men_files/figure-latex/cohort-distr-1.pdf Graphic file (type pdf)
+<use age-at-first-birth-men_files/figure-latex/cohort-distr-1.pdf>
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/cohort-distr-1.pdf  used on input line 249.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[3 <./age-at-first-birth-men_files/figure-latex/cohort-distr-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/interview-dates-1.pdf, id=40, 469.755pt x 325.215pt>
+File: age-at-first-birth-men_files/figure-latex/interview-dates-1.pdf Graphic file (type pdf)
+<use age-at-first-birth-men_files/figure-latex/interview-dates-1.pdf>
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/interview-dates-1.pdf  used on input line 287.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[4 <./age-at-first-birth-men_files/figure-latex/interview-dates-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/event-data-1.pdf, id=53, 469.755pt x 325.215pt>
 File: age-at-first-birth-men_files/figure-latex/event-data-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/event-data-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/event-data-1.pdf  used on input line 442.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/event-data-1.pdf  used on input line 370.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[4]
+[5 <./age-at-first-birth-men_files/figure-latex/event-data-1.pdf>]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 458.
+(Font)              <10> on input line 386.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 458.
+(Font)              <7> on input line 386.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 458.
-[5 <./age-at-first-birth-men_files/figure-latex/event-data-1.pdf>] [6]
-<age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf, id=69, 469.755pt x 325.215pt>
+(Font)              <5> on input line 386.
+[6]
+<age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf, id=83, 469.755pt x 325.215pt>
 File: age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf  used on input line 593.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf  used on input line 521.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf, id=70, 469.755pt x 325.215pt>
+[7]
+<age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf, id=89, 469.755pt x 325.215pt>
 File: age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf  used on input line 611.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf  used on input line 542.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[7 <./age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf>] [8 <./age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf>] [9]
-<age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf, id=104, 469.755pt x 325.215pt>
+[8 <./age-at-first-birth-men_files/figure-latex/unnamed-chunk-1-1.pdf>] [9 <./age-at-first-birth-men_files/figure-latex/cohort-km-1.pdf>] [10]
+<age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf, id=122, 469.755pt x 325.215pt>
 File: age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf  used on input line 746.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf  used on input line 682.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[10 <./age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf>]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 767.
-(c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
-File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [11] [12] [13] [14] [15] [16]
-<age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf, id=163, 469.755pt x 325.215pt>
+[11 <./age-at-first-birth-men_files/figure-latex/pred-smooth-1.pdf>] [12]
+<age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf, id=140, 469.755pt x 325.215pt>
 File: age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf  used on input line 1144.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf  used on input line 799.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[17] [18 <./age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf>]
-<age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf, id=180, 361.35pt x 722.7pt>
+[13 <./age-at-first-birth-men_files/figure-latex/discrete-eha-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf, id=155, 361.35pt x 722.7pt>
 File: age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf  used on input line 1210.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf  used on input line 866.
 (pdftex.def)             Requested size: 325.21751pt x 650.43501pt.
-[19] [20 <./age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf>] [21]
-<age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf, id=202, 361.35pt x 722.7pt>
+[14] [15 <./age-at-first-birth-men_files/figure-latex/plot_raw-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/smoothed-rates-1.pdf, id=170, 469.755pt x 325.215pt>
+File: age-at-first-birth-men_files/figure-latex/smoothed-rates-1.pdf Graphic file (type pdf)
+<use age-at-first-birth-men_files/figure-latex/smoothed-rates-1.pdf>
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/smoothed-rates-1.pdf  used on input line 897.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[16 <./age-at-first-birth-men_files/figure-latex/smoothed-rates-1.pdf>]
+Underfull \vbox (badness 10000) detected at line 960
+ []
+
+[17]
+<age-at-first-birth-men_files/figure-latex/unnamed-chunk-4-1.pdf, id=187, 469.755pt x 325.215pt>
+File: age-at-first-birth-men_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (type pdf)
+<use age-at-first-birth-men_files/figure-latex/unnamed-chunk-4-1.pdf>
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/unnamed-chunk-4-1.pdf  used on input line 989.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[18 <./age-at-first-birth-men_files/figure-latex/unnamed-chunk-4-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf, id=200, 361.35pt x 722.7pt>
 File: age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf  used on input line 1329.
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf  used on input line 1034.
 (pdftex.def)             Requested size: 325.21751pt x 650.43501pt.
-[22] [23 <./age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf>]
-<age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf, id=217, 361.35pt x 722.7pt>
+[19] [20 <./age-at-first-birth-men_files/figure-latex/pred-reg-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf, id=216, 578.16pt x 578.16pt>
 File: age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf  used on input line 1383.
-(pdftex.def)             Requested size: 325.21751pt x 650.43501pt.
-[24] [25 <./age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf>]
-<age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf, id=233, 361.35pt x 722.7pt>
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf  used on input line 1088.
+(pdftex.def)             Requested size: 469.75385pt x 469.75385pt.
+[21]
+Overfull \vbox (1.53656pt too high) detected at line 1112
+ []
+
+[22 <./age-at-first-birth-men_files/figure-latex/nonpara-reg-1.pdf>]
+<age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf, id=231, 578.16pt x 578.16pt>
 File: age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf Graphic file (type pdf)
 <use age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf>
-Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf  used on input line 1412.
-(pdftex.def)             Requested size: 325.21751pt x 650.43501pt.
-[26] [27 <./age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf>] (./age-at-first-birth-men.aux)
+Package pdftex.def Info: age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf  used on input line 1114.
+(pdftex.def)             Requested size: 469.75385pt x 469.75385pt.
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 1135.
+(c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
+File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [23 <./age-at-first-birth-men_files/figure-latex/nonpara-smooth-reg-1.pdf>] [24] [25] [26] [27] (./age-at-first-birth-men.aux)
  ***********
 LaTeX2e <2023-06-01>
 L3 programming layer <2023-06-05>
@@ -635,18 +667,18 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 14072 strings out of 477680
- 226815 string characters out of 5828857
- 1926753 words of memory out of 5000000
- 34188 multiletter control sequences out of 15000+600000
+ 14116 strings out of 477680
+ 229525 string characters out of 5828857
+ 1925753 words of memory out of 5000000
+ 34229 multiletter control sequences out of 15000+600000
  574654 words of font info for 127 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 77i,10n,81p,1019b,556s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 77i,10n,81p,1019b,558s stack positions out of 10000i,1000n,20000p,200000b,80000s
 {c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}<c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx9.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtko10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/schubert/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on age-at-first-birth-men.pdf (27 pages, 512065 bytes).
+Output written on age-at-first-birth-men.pdf (27 pages, 533696 bytes).
 PDF statistics:
- 401 PDF objects out of 1000 (max. 8388607)
- 310 compressed objects within 4 object streams
- 68 named destinations out of 1000 (max. 500000)
- 32934 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 435 PDF objects out of 1000 (max. 8388607)
+ 336 compressed objects within 4 object streams
+ 71 named destinations out of 1000 (max. 500000)
+ 32962 words of extra memory for PDF output out of 35830 (max. 10000000)
 
