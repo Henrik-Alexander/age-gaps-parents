@@ -1,5 +1,5 @@
 ---
-title: "Becoming Father"
+title: "Report: Becoming Father"
 subtitle: "Age at first birth among men in Germany based on the SOEP"
 author: "Henrik Schubert"
 date: "2023-06-15"
@@ -25,6 +25,8 @@ library(eha)
 library(casebase)
 library(GGally)
 library(stargazer)
+library(survminer)
+
 
 # Specify the central cohorts
 cohorts <- c("(1940,1950]","(1950,1960]","(1960,1970]", "(1970,1980]", "(1980,1990]")
@@ -38,7 +40,7 @@ estimate <- FALSE
 
 
 # Purpose
-Fertility of men deviates from fertility of women. Research points at a wider age-distribution of childbearing and that fertility is more shifted towards the later ages. Despite the increasing evidence on sex differences with respect to age-specific fertility, the information on the age distribution of first births among men remains scarce. For that reason this study utilizes the *Socio-ökonomisches Panel* (SOEP) in order to describe the transition to fatherhood. We use non-parametric approaches as well as survival models to better investigate the effect of age net of other socio-ecnonmic factors. A focus of this study lies on cohort differences and differences between East and West.
+Fertility of men deviates from fertility of women. Research points at a wider age-distribution of childbearing and that fertility is more shifted towards the later ages. Despite the increasing evidence on sex differences with respect to age-specific fertility, the information on the age distribution of first births among men remains scarce. For that reason this study utilizes the *Socio-ökonomisches Panel* (SOEP) in order to describe the transition to fatherhood. We use non-parametric approaches as well as survival models to better investigate the effect of age net of other socio-econonmic factors. A focus of this study lies on cohort differences and differences between East and West.
 
 
 ## Data wrangling
@@ -136,6 +138,7 @@ Table \@ref(table:data-structure1) displays the current shape of the data, when 
 fert2 |>
   arrange(persnr, bioage) |>
   slice_head(n = 10) |>
+  select(pid, cohort, bioyear, bioage, Event) |> 
   pander()
 ```
 
@@ -172,7 +175,7 @@ $$
 
 
 ### Population
-First, we make the kaplan-meier estimator for the entire population.
+First, we look at the cases which experience the event and which are censored.
 
 ```{r}
 ### Prepare the survival data ------------------------------------
@@ -205,11 +208,13 @@ In Figure \@ref(fig:cohort-km), the kaplan-meier curves for specific cohorts are
 km_coh <- survfit(Surv(Censoring, Event) ~ cohort, data = fert2, conf.int = 0.95, type = "kaplan-meier", error = "greenwood") 
 
 # Plot
-ggsurv(km_coh) + scale_y_continuous(expand = c(0, 0), limits = c(0, 1.01))
+ggsurv(km_coh) + 
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  guides(colour =  guide_legend(nrow = 3, byrow = TRUE))
 ```
 
 ## Smoothed hazard models
-Beyond describing the survival process using Kaplan-Meier estimates, we also estimate smoothed hazard models. The results from the smoothed hazard model are displayed in table. 
+Beyond describing the survival process using the Kaplan-Meier estimator, we also estimate smoothed hazard models. The results from the smoothed hazard model are displayed in table. 
 
 
 ```{r}
@@ -219,7 +224,7 @@ if(all( isFALSE(estimate) & file.exists("Results/smoothed.Rda"))){
   
 }else{
   # Run the regression model
-mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), knots = c( 20, 25, 30, 35, 40)) * cohort,
+mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), knots = knots) * cohort,
                           data = fert2, 
                           time = "Censoring")
 
@@ -231,7 +236,9 @@ mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), knots = c( 20, 25, 30, 35, 
 pander(mod_cb)
 ```
 
+
 In order to get a better understanding of the model, I visualized predicted probabilities of first birth by age and cohort in Figure \@ref(fig: pred-smooth).
+
 
 ```{r pred-smooth}
 if(all(isFALSE(estimate) & file.exists("Results/predict_smoothed_eha.Rda"))){
@@ -267,58 +274,12 @@ plot_results$fit |>
 
 ```
 
-## Parametric regression models
-To allow for the inclusion of covariates, we used parametric event-history models.
-In order to abstain from too restrictive assumptions regarding the parametric shape, we have estimated models with several parametric specifications and compared the results using log-rank tests.
-
-### Exponential model
-
-```{r parametric-models1, results='asis'}
-### Make parametric hazard models --------------------------------
-
-# Exponential
-exp <- par_surv(distribution = "exponential")
-stargazer(exp, header = FALSE, type = 'latex')
-```
-
-### Weibull model
-```{r parametric-models2, results='asis'}
-# Weibull
-weib <- par_surv(distribution = "weibull")
-stargazer(weib, header = FALSE, type = 'latex')
-```
-
-### Gaussian model
-```{r parametric-models3, results='asis'}
-# Gompertz
-#gomp <- par_surv(distribution = "gompertz")
-
-# Gaussian
-gauss <- par_surv(distribution = "gaussian")
-stargazer(gauss, header = FALSE, type = 'latex')
-```
-
-### Log-normal model
-```{r parametric-models4, results='asis'}
-# Lognormal
-lognor <- par_surv(distribution = "lognormal")
-stargazer(gauss, header = FALSE, type = 'latex')
-```
-
-### Log-logistic model
-```{r parametric-models5, results='asis'}
-# Log-logistic
-loglog <- par_surv(distribution = "loglogistic")
-stargazer(loglog, header = FALSE, type = 'latex')
-
-```
-
 
 ## Discrete time survival model
-While the parametric assumptions allow for more *degrees of freedom*, misspecification of the process may occur. In order to circumvent this issue, we have also estimated discrete time hazard models with splines for the age variables. We set the knots at 5-year age intervals. 
+While the parametric assumptions allow for more *degrees of freedom*, misspecification of the process may occur. In order to circumvent this issue, we have also estimated discrete time hazard models with splines for the age variables. We set the knots at 5-year age intervals. For this estimation, we use data in long-format, as is illustrated below.
 
-```{r discrete-eha}
 
+```{r spell-data}
 if(all(isFALSE(estimate) & file.exists("Results/discrete_eha_splines.Rda"))){
   
   # Load the data
@@ -350,6 +311,20 @@ pred_data <- pred_data |> filter((cohort == "(1970,1980]" & Censoring <= 40) |
                                    (cohort == "(1980,1990]" & Censoring <= 30 ) |
                                    cohort %in% c("(1950,1960]", "(1960,1970]", "(1940,1950]"))
 
+
+# Print the spell data
+spell_data |>
+  arrange(pid, start) |> 
+  select(persnr, cohort, start, sumkids, Censoring, Event, kidgeb_01) |> 
+  slice_head(n = 15) |>
+  pander()
+```
+
+
+The results for the discrete-time logistic regression in form of predicted probabilities are displayed below.
+
+
+```{r discrete-eha}
 # Plot the result
 ggplot(pred_data, aes(Censoring, prediction, colour = cohort, group = cohort)) +
   geom_line(size = 1.3)  +
@@ -372,13 +347,16 @@ ggsave(last_plot(), filename = "Figures/logistic_splines_soep.pdf")
 ### A non-parametric approach
 While the models are useful for incorporating covariates, they may rely on too restrictive assumptions. Therefore, we also used a non-parametric approach to estimate age-specific first birth rates.
 
+
 We used the spell data and aggregated the exposures as well as the births by age. Than, we simply estimated the rates in the following way:
+
 
 $$
 rate(x) = \frac{B_{firstbirth}(x)}{P_{childless}}
 $$
 
 Figure \@ref{fig:plot_raw} illustrates the raw age-specific first birth rates for different cohorts. Because the data is from a survey, the rates show an erratic pattern. Nonetheless, the expected bell-shape becomes apparent.
+
 
 ```{r plot_raw, fig.width = 5, fig.height = 10}
 
@@ -417,7 +395,9 @@ plot_raw
 
 ```
 
+
 In order to reduce the noise and random fluctuations, which result from limited case numbers and the spread of the interview dates, we have smoothed the age-specific first birth rates using a *locally estimated scatterplot smoothing* (loess). The results are presented in Figure \@ref{fig:smoothed-rates}
+
 
 ```{r smoothed-rates}
 
@@ -440,8 +420,10 @@ plot_interpol <- unparametric |>
 
 ```
 
+
 # Comparison by birth region
-It is very likely that some of the change in the age distribution is driven by the impactful reunification, which caused migration as well as fertility postponement. Thus, we estimated non-parametric age-specific first birth rates seperately by birth region. The sample was split into persons who were born in East-Germany and respondents who were born in West Germany. Following common practice, respondents from Berlin were classified as East-German.
+It is very likely that some of the change in the age distribution is driven by the impact reunification, which caused migration as well as fertility postponement. Thus, we estimated non-parametric age-specific first birth rates separately by birth region. The sample was split into persons who were born in East-Germany and respondents who were born in West Germany. Following common practice, respondents from Berlin were classified as East-German.
+
 
 ```{r}
 if(all(isFALSE(estimate) & file.exists("Data/region_spell_data.Rda"))){
@@ -485,7 +467,34 @@ save(spell_data_reg, file = "Data/spell_data_reg.Rda")
 pred_data <- expand.grid(Censoring = 15:55, cohort = unique(fert2$cohort), birthregion = c("East", "West"))
 ```
 
-Once we have prepared the data, we estimate a discrete time survival regression with knots in 5-year intervals, with interactions between cohort and birth region. We than plot the predicted probabilities from the model in \@ref(fig:pred-reg)
+
+Once we have prepared the data, we estimate Kaplan-Meier curves by region.
+
+
+```{r}
+# Fit by cohort
+km_coh_reg <- survfit(Surv(Censoring, Event) ~ cohort + birthregion,
+                      data = fert2, conf.int = 0.95,
+                      type = "kaplan-meier", error = "greenwood") 
+
+# Transform into a data frame
+km_coh_reg_data <- surv_summary(km_coh_reg, data = fert2) |> 
+  filter(time <= 50)
+    
+# Plot
+ggplot(km_coh_reg_data, aes(x = time, y = surv,colour = cohort)) +
+  geom_step() +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  guides(colour =  guide_legend(nrow = 3, byrow = TRUE)) +
+  facet_wrap( ~ birthregion)
+
+# Save the plot
+ggsave(last_plot(), filename = "Figures/km_reg-coh.pdf")
+  
+```
+
+
+In the next step, we estimate a discrete time survival regression with knots in 5-year intervals, with interactions between cohort and birth region. We than plot the predicted probabilities from the model in \@ref(fig:pred-reg)
 
 
 ```{r pred-reg,  fig.height = 10, fig.width = 5}
@@ -521,7 +530,9 @@ ggplot(pred_data, aes(Censoring, prediction, colour = cohort, group = cohort)) +
 ggsave(last_plot(), filename = "Figures/logistic_reg_soep.pdf")
 ```
 
+
 As outlined earlier, the models may suffer from subjectivity and parametric assumptions, while they increase the degrees of freedom. We estimate the age-specific first birth rates using the non-parametric approach as well. The results with the raw birth rates is displayed in Figures \@ref(fig:nonpara-reg).
+
 
 ```{r nonpara-reg,  fig.height = 10, fig.width = 5}
 ### Unparametric by birthregion ------------------------------------
@@ -583,5 +594,54 @@ plot_interpol_reg <- unparametric_reg |>
 
 # Plot the interpolated result
 plot_interpol_reg
+```
+
+
+
+## Parametric regression models
+To allow for the inclusion of covariates, we used parametric event-history models.
+In order to abstain from too restrictive assumptions regarding the parametric shape, we have estimated models with several parametric specifications and compared the results using log-rank tests.
+
+
+### Exponential model
+
+```{r parametric-models1, results='asis'}
+### Make parametric hazard models --------------------------------
+
+# Exponential
+exp <- par_surv(distribution = "exponential")
+stargazer(exp, header = FALSE, type = 'latex')
+```
+
+### Weibull model
+```{r parametric-models2, results='asis'}
+# Weibull
+weib <- par_surv(distribution = "weibull")
+stargazer(weib, header = FALSE, type = 'latex')
+```
+
+### Gaussian model
+```{r parametric-models3, results='asis'}
+# Gompertz
+#gomp <- par_surv(distribution = "gompertz")
+
+# Gaussian
+gauss <- par_surv(distribution = "gaussian")
+stargazer(gauss, header = FALSE, type = 'latex')
+```
+
+### Log-normal model
+```{r parametric-models4, results='asis'}
+# Lognormal
+lognor <- par_surv(distribution = "lognormal")
+stargazer(gauss, header = FALSE, type = 'latex')
+```
+
+### Log-logistic model
+```{r parametric-models5, results='asis'}
+# Log-logistic
+loglog <- par_surv(distribution = "loglogistic")
+stargazer(loglog, header = FALSE, type = 'latex')
+
 ```
 
