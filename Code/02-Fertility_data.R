@@ -17,6 +17,9 @@ library(survival)
 library(eha)
 library(casebase)
 
+# Specify the central cohorts
+cohorts <- c("(1940,1950]","(1950,1960]","(1960,1970]", "(1970,1980]", "(1980,1990]")
+
 
 ### Load residence data ---------------------------------------------- 
 
@@ -64,6 +67,11 @@ fert2 <- fert2 |> pivot_wider(names_from = c(Variable, Number), values_from = Va
 
 # Create cohorts - split by 5 year groups
 fert2 <- fert2 |> mutate(cohort = cut(gebjahr, breaks = seq(1900, 2020, by = 10), dig.lab = 4))
+
+
+# Filter the data
+fert2 <- fert2 |> filter(cohort %in% cohorts)
+
 
 # Double check
 fert2 <- fert2 |> filter(!is.na(gebjahr) & !is.na(bioyear))
@@ -115,12 +123,6 @@ km_coh <- survfit(Surv(Censoring, Event) ~ cohort, data = fert2, conf.int = 0.95
 plot(km_coh)
 
 ### Fit the smoothed hazards -------------------------------------
-
-# Select the central cohorts
-cohorts <- c("(1940,1950]","(1950,1960]","(1960,1970]", "(1970,1980]", "(1980,1990]")
-
-# Filter the data
-fert2 <- fert2 |> filter(cohort %in% cohorts)
 
 # Run the regression model
 mod_cb <- fitSmoothHazard(Event ~ ns(log(Censoring), knots = c( 20, 30, 35, 40)) * cohort,

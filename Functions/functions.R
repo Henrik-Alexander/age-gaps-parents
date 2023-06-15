@@ -45,8 +45,7 @@ par_surv <- function(data = fert2, distribution = "exponential", parameters = NA
   }else if(is.na(parameters) & distribution == "weibull"){
     
     # Run the weibull regression
-    tmp <- phreg(Surv(Censoring, Event) ~ cohort,
-                 dist = distribution, data = data)
+    tmp <- weibreg(Surv(Censoring, Event) ~ strata(cohort), data = data)
     
   }else if(distribution == "gompertz"){
     # Prepare the gompertz data
