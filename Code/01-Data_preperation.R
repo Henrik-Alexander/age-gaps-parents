@@ -24,31 +24,21 @@ source("Functions/graphics.R")
 # Load the data
 id <- read_dta(file = "SOEP_V36/Stata/ppfad.dta")
 
-# Residence during reunification by sex
-tab(id$sex, id$loc1989)
+# Select variables
+id <- subset(id, select = c(persnr, pid, birthregion, loc1989, austritt))
 
-# Create a Treatment Variable
-id <- id |> 
-  mutate(treatment = case_when(loc1989 == 1 & corigin ==1 ~ 1,
-                               loc1989 == 2 | loc1989 ==3 ~ 0)) 
+# Clean the birthregion
+id$birthregion <- ifelse(id$birthregion %in% 11:16, "East",
+                         ifelse(id$birthregion %in% 1:10, "West", NA_character_))
 
-# Select the variables
-id <- id |> select(birthregion, loc1989, treatment, sex, gebmonat, gebjahr, pid, persnr,  ends_with("hhnr"))
-
-# reshape dataset into a long version
-id.long <- id %>% pivot_longer(cols = 10:45,
-                    names_to = "wave",
-                    values_to = "household")
-
-# create a clean number of waves
-id.long$wave <- id.long$wave %>% str_remove(pattern = "hhnr")
-
-#create a survey year variable based on the wave information
-id.long <- id.long %>% group_by(persnr) %>% mutate(syear = 1984:2019) %>% ungroup()
+# Impute birth region if missing using location in 1989
+id$birthregion <- ifelse(is.na(id$birthregion) & id$loc1989 == 2, "West",
+                         ifelse(is.na(id$birthregion) & id$loc1989 == 1, "East", id$birthregion))
 
 ### Household Questionnary -------------------------------------------
-# Create a Variable indicating residence in East Germany
 
+
+# Create a Variable indicating residence in East Germany
 # Load household data
 hh <- read_dta(file = "SOEP_V36/Stata/hgen.dta")
 
@@ -80,7 +70,73 @@ df <- df %>% mutate(treatment2 = treatment,
 ### individual Data --------------------------------------
 
 # Load the data
-pers <- read.delim("SOEP_V36/Stata/pl_reduced.txt")
+#pers <- read.delim("SOEP_V36/Stata/pl_reduced.txt")
+
+
+#
+
+
+### Biographical data -----------------------------------
+
+# Load the data
+bio <- read_dta("SOEP_V36/Stata/biol.dta")
+
+# 
+### Activity calendar ----------------------------------
+
+# Load the data
+act <- read_dta("SOEP_V36/Stata/artkalen.dta")
+
+
+#Join the data
+act <- left_join(act, id, by = c("pid", "persnr"))
+
+
+#
+act2 <- act |> 
+  filter(spellnr == 1) |> 
+  mutate(Total = n()) |> 
+  group_by(spelltyp) |> 
+  summarise(prop = n() / unique(Total),
+            data = "full")
+
+
+# 
+act3 <-act |> 
+  filter(is.na(birthregion) & spellnr == 1) |> 
+  mutate(Total = n()) |> 
+  group_by(spelltyp) |> 
+  summarise(prop = n() / unique(Total),
+            data = "missing")
+
+
+#
+bind_rows(act2, act3) |> 
+  mutate(activity = case_when(spelltyp == 1 ~ "Voll erwerbstätig",
+                            spelltyp == 2 ~ "kurzarbeit",
+                            spelltyp == 3 ~ "teilzeit",
+                            spelltyp == 4 ~ "betr. Ausbildung",
+                            spelltyp == 5 ~ "arbeitslos",
+                            spelltyp == 6 ~ "Rent",
+                            spelltyp == 7 ~ "elternzeit",
+                            spelltyp == 8 ~ "studium",
+                            spelltyp == 9 ~ "Zivildienst",
+                            spelltyp == 10 ~ "Hausfrau(-mann)",
+                            spelltyp == 11 ~ "nebenberufl. Tätigkeit",
+                            spelltyp == 12 ~ "sonstiges",
+                            spelltyp == 13 ~ "in Lehre",
+                            spelltyp == 14 ~ "Fortbildung",
+                            spelltyp == 15 ~ "Minijob")) |> 
+  ggplot(aes(x = activity, y = prop, fill = data)) +
+  geom_col(position = position_dodge()) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_manual(values = c(MPIDRblue, MPIDRred)) +
+  coord_flip() +
+  ylab("") + xlab("")
+
+# Save the figure
+ggsave(last_plot(), filename = "Figures/selection_birthreg.pdf")
+
 
 
 ### Relationship Data  ############################

@@ -34,7 +34,7 @@ birthyears <- 1945:1995
 knots <- c(20, 25, 30, 35, 40)
 
 # Switch to TRUE, if you would like to re-estimate the models
-estimate <- FALSE
+estimate <- TRUE
 ```
 
 
@@ -46,7 +46,7 @@ Fertility of men deviates from fertility of women. Research points at a wider ag
 For the study we harness the *biobirth* questionnaire from SOEP. The questionnaire contains questions on biological children of the respondent. The Figure \@ref(fig:interview-dates) below illustrates the distribution of interview years for that particular questionnaire. It becomes visible that the interviews were mostly executed after the year 2000 and they were biannually.
 
 
-```{r cohort-distr, fig.cap = "Distribution of biobirth interviews in the SOEP"}
+```{r cohort-distr, fig.cap = "Distribution of cohorts in the SOEP biobirth interview"}
 ### Load bio-birth data ---------------------------------------------- 
 if(all(isFALSE(estimate) &
        file.exists("Data/spell_data.Rda") &
@@ -164,7 +164,7 @@ In \@ref(fig:event-data) illustrates the distribution of censoring or event time
 
 This graphical representation provides valuable insights into the survival experience of a population or a specific group, illustrating the probability of experiencing the event at a specific time point. 
 
-```{r event-data}
+```{r event-data, fig.cap = "Distribution of age at censoring and age at first birth in the SOEP biobiorth data."}
 ### Descriptive data ---------------------------------------------
 
 # Plot discriptively
@@ -220,7 +220,7 @@ ggplot(km_result, aes(time, y=  surv, ymin = lower, ymax = upper)) +
 ### Cohort specific
 In Figure \@ref(fig:cohort-km), the kaplan-meier curves for specific cohorts are displayed. 
 
-```{r cohort-km}
+```{r cohort-km, fig.cap = "Kaplan-Meier estimator for the transition to first birth in the SOEP bio-birth data."}
 # Fit by cohort
 km_coh <- survfit(Surv(Censoring, Event) ~ cohort, data = fert2,
                   conf.int = 0.95, type = "kaplan-meier", error = "greenwood") 
@@ -258,7 +258,7 @@ pander(mod_cb)
 In order to get a better understanding of the model, I visualized predicted probabilities of first birth by age and cohort in Figure \@ref(fig: pred-smooth).
 
 
-```{r pred-smooth}
+```{r pred-smooth, fig.cap = "Predicted probabilities for giving a first birth at age based on logistic regression with splines."}
 if(all(isFALSE(estimate) & file.exists("Results/predict_smoothed_eha.Rda"))){
   
   # Load the predicted data
@@ -342,7 +342,7 @@ spell_data |>
 The results for the discrete-time logistic regression in form of predicted probabilities are displayed below.
 
 
-```{r discrete-eha}
+```{r discrete-eha, fig.cap = "Predicted hazard rate from discrete time survival model."}
 # Plot the result
 ggplot(pred_data, aes(Censoring, prediction, colour = cohort, group = cohort)) +
   geom_line(size = 1.3)  +
@@ -376,7 +376,7 @@ $$
 Figure \@ref{fig:plot_raw} illustrates the raw age-specific first birth rates for different cohorts. Because the data is from a survey, the rates show an erratic pattern. Nonetheless, the expected bell-shape becomes apparent.
 
 
-```{r plot_raw, fig.width = 5, fig.height = 10}
+```{r plot_raw, fig.width = 8, fig.height = 8, fig.cap = "Age-specific first birth rates based on unparametric estimation using SOEP bio-birth data."}
 
 # Estimate the exposures
 exposures <- spell_data |> group_by(start, cohort) |> count()
@@ -418,7 +418,7 @@ plot_raw
 In order to reduce the noise and random fluctuations, which result from limited case numbers and the spread of the interview dates, we have smoothed the age-specific first birth rates using a *locally estimated scatterplot smoothing* (loess). The results are presented in Figure \@ref{fig:smoothed-rates}
 
 
-```{r smoothed-rates}
+```{r smoothed-rates, fig.cap = "Age-specific first birth rates (smoothed) based on unparametric estimation using SOEP bio-birth data."}
 
 # Plot interpolated
 plot_interpol <- unparametric |>
@@ -445,11 +445,11 @@ plot_interpol
 It is very likely that some of the change in the age distribution is driven by the impact reunification, which caused migration as well as fertility postponement. Thus, we estimated non-parametric age-specific first birth rates separately by birth region. The sample was split into persons who were born in East-Germany and respondents who were born in West Germany. Following common practice, respondents from Berlin were classified as East-German.
 
 
-```{r}
-if(all(isFALSE(estimate) & file.exists("Data/region_spell_data.Rda"))){
+```{r. fig.cap = "Distribution of birth region values in the bio-birth data."}
+if(all(isFALSE(estimate) & file.exists("Data/spell_data_reg.Rda"))){
   
   # Load the data
-  load("Data/region_spell_data.Rda")
+  load("Data/spell_data_reg.Rda")
   
   
 }else{
@@ -462,12 +462,13 @@ id <- read_dta(file = "SOEP_V36/Stata/ppfad.dta")
 # Select variables
 id <- subset(id, select = c(persnr, pid, birthregion, loc1989))
 
-#
-
 # Clean the birthregion
 id$birthregion <- ifelse(id$birthregion %in% 11:16, "East",
        ifelse(id$birthregion %in% 1:10, "West", NA_character_))
 
+# Impute birth region if missing using location in 1989
+id$birthregion <- ifelse(is.na(id$birthregion) & id$loc1989 == 2, "West",
+       ifelse(is.na(id$birthregion) & id$loc1989 == 1, "East", id$birthregion))
 
 ### Combine with background variables ----------------------------
 
@@ -502,7 +503,7 @@ pred_data <- expand.grid(Censoring = 15:55, cohort = unique(fert2$cohort), birth
 Once we have prepared the data, we estimate Kaplan-Meier curves by region.
 
 
-```{r}
+```{r, fig.cap = "Kaplan-Meier estimator for the transition to first birth by birth region and by cohort."}
 # Fit by cohort
 km_coh_reg <- survfit(Surv(Censoring, Event) ~ cohort + birthregion,
                       data = fert2, conf.int = 0.95,
@@ -528,7 +529,7 @@ ggsave(last_plot(), filename = "Figures/km_reg-coh.pdf")
 In the next step, we estimate a discrete time survival regression with knots in 5-year intervals, with interactions between cohort and birth region. We than plot the predicted probabilities from the model in \@ref(fig:pred-reg)
 
 
-```{r pred-reg,  fig.height = 10, fig.width = 5}
+```{r pred-reg,  fig.height = 8, fig.width = 8, fig.cap = "Predicted probabilities of firstbirth by age from logistic regression with birthregion and cohort interaction terms."}
 # Estimate a logistic regression
 logist <- glm(Event ~ ns(Censoring, knots = knots) * cohort * birthregion, 
               data = spell_data_reg)
@@ -565,7 +566,7 @@ ggsave(last_plot(), filename = "Figures/logistic_reg_soep.pdf")
 As outlined earlier, the models may suffer from subjectivity and parametric assumptions, while they increase the degrees of freedom. We estimate the age-specific first birth rates using the non-parametric approach as well. The results with the raw birth rates is displayed in Figures \@ref(fig:nonpara-reg).
 
 
-```{r nonpara-reg,  fig.height = 8, fig.width = 8}
+```{r nonpara-reg,  fig.height = 8, fig.width = 8, fig.cap = "Age-specific first birth rate estimated using an un-parametric approach based on data from SOEP bio-birth data."}
 ### Unparametric by birthregion ------------------------------------
 
 # Estimate the exposures
@@ -606,7 +607,7 @@ plot_raw_reg
 Again, we used *loess* to smooth the rates and to yield a more schematic result. The result is displayed in Figure \@ref(fig:nonpara-smooth-reg).
 
 
-```{r nonpara-smooth-reg, fig.height = 8, fig.width = 8}
+```{r nonpara-smooth-reg, fig.height = 8, fig.width = 8, fig.cap = "Age-specific first birth rate (smoothed) estimated using an un-parametric approach based on data from SOEP bio-birth data."}
 # Plot interpolated
 plot_interpol_reg <- unparametric_reg |>
   filter(start >= 18) |> 

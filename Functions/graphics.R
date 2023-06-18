@@ -29,6 +29,7 @@ theme_update(plot.margin = margin(0.1, 0.6, 0.1, 0.1, "cm"),
 )
 
 
+
 ### Basic colours #############################################################
 MPIDRgreen <- "#066E6E"
 MPIDRpurple <- "#3E2C51"
@@ -36,3 +37,6 @@ MPIDRred <- "#8E2A3B"
 MPIDRorange <- "#EF7D00"
 MPIDRblue <- "#08445F"
 MPIDRyellow <- "#FAAF3B"
+
+# Create a pallete
+MPIDRpallette <- c(MPIDRgreen, MPIDRorange, MPIDRred, MPIDRpurple, MPIDRblue)
